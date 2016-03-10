@@ -1,0 +1,17 @@
+[
+    {
+        "base_url": "http://www.dictionaryapi.com/api/v1/references/collegiate/xml/",
+        "dictionary_name": "Merriam-Webster's Collegiate\u00ae Dictionary with Audio",
+        "key": "here goes the key",
+        "enable": false,
+        "id": "m_w_c_d",
+        "lang": "en"
+    },
+    {
+        "base_url": "http://www.iciba.com/",
+        "dictionary_name": "iciba爱词霸",
+        "enable": true,
+        "id": "iciba",
+        "lang": "en"
+    }
+]
