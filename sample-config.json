@@ -13,5 +13,12 @@
         "enable": true,
         "id": "iciba",
         "lang": "en"
+    },
+    {
+        "base_url": "http://dict.cn/",
+        "dictionary_name": "海词词典",
+        "enable": true,
+        "id": "dict_cn",
+        "lang": "en"
     }
 ]

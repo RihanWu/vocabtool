@@ -1,7 +1,7 @@
-"""Module for iciba.com
+"""Module for dict.cn
 
 Type: Webpage
-URL: http://www.iciba.com/
+URL: http://dict.cn/
 """
 
 # Third-party library
@@ -15,8 +15,8 @@ else:
     from dict import base_class
 
 
-class Iciba(base_class.SuperEntry):
-    """Class for looking up a word from iciba.com"""
+class DictCn(base_class.SuperEntry):
+    """Class for looking up a word from dict.cn"""
 
     def __init__(self, dict_info, word_text):
         base_class.SuperEntry.__init__(self, dict_info["id"],
@@ -24,61 +24,51 @@ class Iciba(base_class.SuperEntry):
                                        word_text)
         self.base_url = dict_info["base_url"]
 
-    def _store_info(self, div):
-        """Parse the incoming div"""
+    def _store_info(self, div_word):
+        """Parse the incoming div
+
+        entry.pronounciation    [(British/American, IPA), ...]
+        entry.sound             [(href, href), ...]
+        """
 
         entry = base_class.Entry()
         entry.separate_storage = True
 
         # Pronounciation and sound information
-        base_speak = div.find(attrs={"class": "base-speak"})
-        if base_speak is None:
-            pass
-        else:
-            span = base_speak.find_all("span")
-            i = base_speak.find_all("i")
-            for index, item in enumerate(span):
-                text = item.get_text()
-                entry.pronounciation.append((text[0],
-                                             "[" +
-                                             text[text.index("[") + 2: -2] +
-                                             "]"))
-                href = i[index]["onmouseover"]
-                entry.sound.append(href[href.index("http"): -2])
+        phonetic = div_word.find("div", attrs={"class": "phonetic"})
+        spans = phonetic.find_all("span")
+        for span in spans:
+            entry.pronounciation.append(tuple(span.get_text().split()))
+            hrefs = tuple(["http://audio.dict.cn/" + x["naudio"]
+                           for x in span.find_all("i")])
+            entry.sound.append(hrefs)
 
         # Explanation
-        # Take only the first list
-        base_list = div.find_all(attrs={"class": "base-list switch_part"})
-        if len(base_list) is not 0:
-            items = base_list[0].find_all("li")
-            # Different pos
-            for item in items:
+        dict_basic_ul = div_word.find("ul", attrs={"class": "dict-basic-ul"})
+        for child in dict_basic_ul.find_all("li"):
+            if child.get("style") is None:
                 copy_entry = base_class.Entry()
                 copy_entry.pronounciation = entry.pronounciation
                 copy_entry.sound = entry.sound
-                copy_entry.pos = item.span.get_text()
-                exp_text = [x.strip() for x in item.p.get_text().split(";")]
-                copy_entry.explanation = ";".join(exp_text)
+                copy_entry.pos = child.span.get_text()
+                copy_entry.explanation = child.strong.get_text()
                 self.entries.append(copy_entry)
-        else:
-            # There is only the keyword with no explanation
-            self.valid = False
+
 
     def lookup(self):
-        """Lookup word in iciba"""
+        """Lookup word in dict.cn"""
 
         # Fetch data from the server
         response = requests.get(self.base_url + self.word_text)
 
         # Parse the webpage
         soup = BeautifulSoup(response.text, "lxml")
-        divs = soup.find_all("div", attrs={"class": "info-article info-base"})
+        div_word = soup.find("div", attrs={"class": "word"})
 
-        if (len(divs) == 0):
+        if (len(div_word.find_all("div")) is 0):
             self.valid = False
         else:
-            # Only parse first div
-            self._store_info(divs[0])
+            self._store_info(div_word)
 
     def show_no_style(self):
         """Generate displayable formated text"""
@@ -105,8 +95,8 @@ class Iciba(base_class.SuperEntry):
 
 
 def lookup(dict_info, word_text):
-    """The lookup function for iciba"""
+    """The lookup function for dict.cn"""
 
-    result = Iciba(dict_info, word_text)
+    result = DictCn(dict_info, word_text)
     result.lookup()
     return result
