@@ -5,7 +5,10 @@ URL: http://www.dictionaryapi.com/api/v1/references/collegiate/xml/
 """
 
 # Third-party library
-import requests
+try:
+    import requests
+except ImportError:
+    import urllibRequests as requests
 from bs4 import BeautifulSoup
 
 # Local module
