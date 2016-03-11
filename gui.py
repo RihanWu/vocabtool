@@ -98,7 +98,7 @@ class VocabTool(tk.Tk):
         for super_entry in lookup_result:
             show = show + super_entry.show_with_style()
         if show == "":
-            show = "No result"
+            show = "No reponse"
         self.update_word_display(show)
 
     def add_to_database(self):

@@ -11,7 +11,7 @@ while(True):
     result = core.lookup_word(word, "en")
     show = ""
     for super_entry in result:
-        show = show + super_entry.show_with_style()
+        show = show + super_entry.show_no_style()
     if show == "":
-        show = "No result"
+        show = "No reponse"
     print(show)
