@@ -4,11 +4,8 @@ Type: API
 URL: http://www.dictionaryapi.com/api/v1/references/collegiate/xml/
 """
 
+import urllibRequests as requests
 # Third-party library
-try:
-    import requests
-except ImportError:
-    import urllibRequests as requests
 from bs4 import BeautifulSoup
 
 # Local module
