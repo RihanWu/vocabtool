@@ -63,23 +63,29 @@ def parseArgs(args):
     elif args[0] in ['-h','--help','-?']:
         result['action']='help' # Print help message
     elif args[0] in ['-l','--list']:
-        result['action']='dict' # Print all available dictionaries
+        result['action']='dict' # Print all dictionaries
     else:
         result['action']='look'
-        result['dict']=checkDict(args) # Specify Dictionary - Return a list
+        result['dict']=checkDict(args) # Specify Dictionary
         result['format']=checkFormat(args) # Specify Format
         result['output']=checkOutput(args)
-        result['word']=args[-1] # The word to look up is always at the end.
+        result['word']=args[-1] # The word to look up
     return result
 
 def printHelp():
-    print('VocabTool\n\nusage:\t'+sys.argv[0]+' [-h | -i | -l]\n\t'+sys.argv[0]+' [-d Dictionary] [-f Format] [-o Output] word\n')
-    print('\td: Specify which dictionary to use. Use multiple times\n\t   to specify multiple dictionaries. Default: all.')
-    print('\tf: Specify which format the output should be. Available\n\t   choices: text, rtf, pdf. Default: text.')
-    print('\th: Print this help message.')
-    print('\ti: Invoke interactive text interface.')
-    print('\tl: List all of the available dictionaries.')
-    print('\to: Specify the output file. Default: standard output.')
+    print('VocabTool\n\nusage:\t'+
+          sys.argv[0]+
+          ' [-h | -i | -l]\n\t'+
+          sys.argv[0]+
+          ' [-d Dictionary] [-f Format] [-o Output] word\n\n'+
+          '\td: Specify which dictionary to use. Use multiple times\n'+
+          '\t   to specify multiple dictionaries. Default: all.\n'+
+          '\tf: Specify which format the output should be. Available\n'+
+          '\t   choices: text, rtf, pdf. Default: text.\n'+
+          '\th: Print this help message.\n'+
+          '\ti: Invoke interactive text interface.\n'+
+          '\tl: List all of the available dictionaries.\n'+
+          '\to: Specify the output file. Default: standard output.')
 
 def printDict():
     import json
