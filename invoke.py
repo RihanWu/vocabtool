@@ -4,22 +4,24 @@
 
 import sys
 
+def lookupSingleWord(word):
+    import core
+    result = core.lookup_word(word,"en")
+    show = ""
+    for super_entry in result:
+        show += super_entry.show_no_style()
+    if show == "":
+        show = "No response"
+    return show
+
 def cliInterface():
     # TODO: Implement CLI
-    # Import core component
-    import core
 
-    print("This is the CLI interface of  vocabtool")
+    print("This is the CLI interface of vocabtool")
 
     while(True):
         word = input("Please input the word to lookup[English]:")
-        result = core.lookup_word(word, "en")
-        show = ""
-        for super_entry in result:
-            show = show + super_entry.show_no_style()
-        if show == "":
-            show = "No reponse"
-        print(show)
+        print(lookupSingleWord(word))
 
 def checkDict(argv):
     args=list(argv)
@@ -36,7 +38,7 @@ def getParam(argv,keys,default):
     result = default
     lastOccur = len(args)
     for item in keys:
-        while item in args:
+        if item in args:
             if lastOccur > args.index(item):
                 lastOccur = args.index(item)
                 result = args[lastOccur -1]
@@ -79,15 +81,27 @@ def printHelp():
     print('\tl: List all of the available dictionaries.')
     print('\to: Specify the output file. Default: standard output.')
 
+def printDict():
+    import json
+    config_filename = "config.json"
+    with open(config_filename, "rb") as handle:
+        content = handle.read().decode("utf-8")
+        config = json.loads(content)
+    for dictionary in config:
+        if dictionary["enable"]:
+            print(dictionary["id"])
+
 def main(args):
     result = parseArgs(args)
     if result['action']=='help':
         printHelp()
     elif result['action']=='cli':
         cliInterface()
+    elif result['action']=='dict':
+        printDict()
     else:
         # TODO: Invoke core here.
-        print(result)
+        print(lookupSingleWord(result['word']))
 
 if __name__ == '__main__':
     main(sys.argv[1:])
