@@ -54,7 +54,6 @@ class DictCn(base_class.SuperEntry):
                 copy_entry.explanation = child.strong.get_text()
                 self.entries.append(copy_entry)
 
-
     def lookup(self):
         """Lookup word in dict.cn"""
 
