@@ -2,6 +2,12 @@
 
 This program consists a core module and other peripheral modules. We try to make all the modules interchangeable and extendable so that we can have different user interfaces, different dictionary-source modules, and different database/latex interfaces.
 
+## Coding Style
+Try to follow PEP8 as much as possible.
+
+## Contributor License Agreement
+Pending...
+
 ## Program logic
 
 ### Initialize
