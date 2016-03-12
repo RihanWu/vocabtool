@@ -4,8 +4,8 @@ Type: Webpage
 URL: http://dict.cn/
 """
 
+import urllibRequests as requests
 # Third-party library
-import requests
 from bs4 import BeautifulSoup
 
 # Local module
