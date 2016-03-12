@@ -71,7 +71,7 @@ class Iciba(base_class.SuperEntry):
         response = requests.get(self.base_url + self.word_text)
 
         # Parse the webpage
-        soup = BeautifulSoup(response.text, "lxml")
+        soup = BeautifulSoup(response, "lxml")
         divs = soup.find_all("div", attrs={"class": "info-article info-base"})
 
         if (len(divs) == 0):

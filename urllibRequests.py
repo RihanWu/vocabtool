@@ -1,7 +1,8 @@
 import urllib.request
 import urllib.parse
 
-def get(urlStr,params={}):
+
+def get(urlStr, params={}):
     reqdata = urllib.request.Request(urlStr)
     reqdata.add_header('User-Agent',
                        'VocabTool/0.2 (https://github.com/RihanWu/vocabtool)')

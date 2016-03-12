@@ -54,7 +54,6 @@ class DictCn(base_class.SuperEntry):
                 copy_entry.explanation = child.strong.get_text()
                 self.entries.append(copy_entry)
 
-
     def lookup(self):
         """Lookup word in dict.cn"""
 
@@ -62,7 +61,7 @@ class DictCn(base_class.SuperEntry):
         response = requests.get(self.base_url + self.word_text)
 
         # Parse the webpage
-        soup = BeautifulSoup(response.text, "lxml")
+        soup = BeautifulSoup(response, "lxml")
         div_word = soup.find("div", attrs={"class": "word"})
 
         if (len(div_word.find_all("div")) is 0):
