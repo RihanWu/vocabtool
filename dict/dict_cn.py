@@ -4,11 +4,8 @@ Type: Webpage
 URL: http://dict.cn/
 """
 
+import urllibRequests as requests
 # Third-party library
-try:
-    import requests
-except ImportError:
-    import urllibRequests as requests
 from bs4 import BeautifulSoup
 
 # Local module
