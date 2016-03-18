@@ -19,7 +19,6 @@ This project is published under MIT license.
 ## Requirement
 - Python 3.x
 - BeautifulSoup 4
-- Requests
 
 ##Config
 Configuration is stored in a config.json file(sample config file included). The specific structure depends on the module that uses it. This program does not contain access keys to dictionary APIs, users should apply for their own keys.
