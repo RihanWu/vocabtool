@@ -25,4 +25,4 @@ This project is published under MIT license.
 Configuration is stored in a config.json file(sample config file included). The specific structure depends on the module that uses it. This program does not contain access keys to dictionary APIs, users should apply for their own keys.
 
 ## Developer
-Please read README(for developer).md
+Please read [README(for developer)](https://github.com/RihanWu/vocabtool/blob/master/README(for%20developer).md)

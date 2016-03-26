@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """CLI interface of vocabtool"""
 
 # TODO: Implement CLI
