@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Module for Merriam-Webster's Collegiate Dictionary with Audio
 
 Type: API

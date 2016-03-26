@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """VocabTool database module
 
 This is the database module of 'VocabTool'.
