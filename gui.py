@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """VocabTool GUI module
 
 This is the GUI module of 'VocabTool'.

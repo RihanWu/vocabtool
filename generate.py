@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """VocabTool "generate" module
 
 This is the "generate" module of 'VocabTool'.
