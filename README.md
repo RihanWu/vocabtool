@@ -1,5 +1,7 @@
 #VocabTool -- (Under development)
 
+[![Join the chat at https://gitter.im/RihanWu/vocabtool](https://badges.gitter.im/RihanWu/vocabtool.svg)](https://gitter.im/RihanWu/vocabtool?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 This is a tool aiming to help with vocabulary learning.
 
 ##License
