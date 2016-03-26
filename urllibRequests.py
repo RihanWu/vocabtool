@@ -10,11 +10,6 @@ else:
     import urllib.parse as par
 
 
-class Response():
-    def __init__(self, data, charset='UTF-8'):
-        self.text = data.decode(charset)
-
-
 def _get_encoding(ctstr):
     return ctstr[ctstr.find('charset')+8:]
 
@@ -57,6 +52,6 @@ def get(urlStr, params={}):
         result = resp.read()
     content_type = resp.headers.get('Content-Type')
     if (content_type and content_type.find('charset') != -1):
-        return Response(result, _get_encoding(content_type))
+        return result.decode(_get_encoding(content_type))
     else:
-        return Response(result)
+        return result.decode('UTF-8')
