@@ -5,8 +5,8 @@ Type: Webpage
 URL: http://www.iciba.com/
 """
 
+import urllibRequests as requests
 # Third-party library
-import requests
 from bs4 import BeautifulSoup
 
 # Local module
@@ -72,7 +72,7 @@ class Iciba(base_class.SuperEntry):
         response = requests.get(self.base_url + self.word_text)
 
         # Parse the webpage
-        soup = BeautifulSoup(response.text, "lxml")
+        soup = BeautifulSoup(response, "lxml")
         divs = soup.find_all("div", attrs={"class": "info-article info-base"})
 
         if (len(divs) == 0):

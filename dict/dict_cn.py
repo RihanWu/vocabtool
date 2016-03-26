@@ -5,8 +5,8 @@ Type: Webpage
 URL: http://dict.cn/
 """
 
+import urllibRequests as requests
 # Third-party library
-import requests
 from bs4 import BeautifulSoup
 
 # Local module
@@ -62,7 +62,7 @@ class DictCn(base_class.SuperEntry):
         response = requests.get(self.base_url + self.word_text)
 
         # Parse the webpage
-        soup = BeautifulSoup(response.text, "lxml")
+        soup = BeautifulSoup(response, "lxml")
         div_word = soup.find("div", attrs={"class": "word"})
 
         if (len(div_word.find_all("div")) is 0):
