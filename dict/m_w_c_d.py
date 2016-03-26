@@ -5,8 +5,8 @@ Type: API
 URL: http://www.dictionaryapi.com/api/v1/references/collegiate/xml/
 """
 
+import urllibRequests as requests
 # Third-party library
-import requests
 from bs4 import BeautifulSoup
 
 # Local module
@@ -76,7 +76,7 @@ class MerriamWebster(base_class.SuperEntry):
                                 params={"key": self.key})
 
         # Parse the xml fetched
-        soup = BeautifulSoup(response.text, "lxml")
+        soup = BeautifulSoup(response, "lxml")
         entries = soup.find_all("entry")
 
         if (entries):  # If the word is valid
