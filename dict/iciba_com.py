@@ -5,7 +5,7 @@ Type: Webpage
 URL: http://www.iciba.com/
 """
 
-import urllibRequests as requests
+import vocabtool.urllibRequests as requests
 import re
 # Third-party library
 from bs4 import BeautifulSoup
@@ -14,7 +14,9 @@ from bs4 import BeautifulSoup
 if __name__ == "__main__":
     import base_class
 else:
-    from dict import base_class
+    from vocabtool.dict import base_class
+
+__parse_method__ = "re"
 
 
 class Iciba(base_class.SuperEntry):
