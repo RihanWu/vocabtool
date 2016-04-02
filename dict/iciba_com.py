@@ -6,6 +6,7 @@ URL: http://www.iciba.com/
 """
 
 import urllibRequests as requests
+import re
 # Third-party library
 from bs4 import BeautifulSoup
 
@@ -25,42 +26,42 @@ class Iciba(base_class.SuperEntry):
                                        word_text)
         self.base_url = dict_info["base_url"]
 
-    def _store_info(self, div):
-        """Parse the incoming div"""
-
-        entry = base_class.Entry()
-        entry.separate_storage = True
-
-        # Pronounciation and sound information
-        base_speak = div.find(attrs={"class": "base-speak"})
-        if base_speak is None:
-            pass
+    def _store_info(self, response):
+        entry_pat = """(?xs)
+                        <ul\sclass='base-list.*?>
+                        .*?
+                        <\/ul>"""
+        explanation_pat = """(?xs)
+                             (?<= <span\sclass='prop'>) #m atch a prop class span
+                             (?P<prop>.*?)   # the prop content
+                             (?= <\/span>)   # end of the span
+                             .*?             # something in between
+                             (?<= <p>)       # the p tag
+                             (?P<p>.*?)      # the content in p
+                             (?= <\/p>)"""
+        pron_pat = """(?xs)
+                    (?<= <span>) #m atch a prop class span
+                    (?P<pron>\w?\s\[.*?\])   # the prop content
+                    (?= <\/span><i\sclass='new-speak-step'\s
+                    onmouseover="displayAudio\(')   # end of the span
+                    (?: .*?)       # the p tag
+                    (?P<url> http.*?\.mp3)      # the content in p
+                    (?: .*?<\/i>)"""
+    
+        entry_match = re.search(entry_pat, response)
+        if entry_match:
+            pron = re.findall(pron_pat, response)
+            explanation = re.findall(explanation_pat, entry_match.group(0))
+            for item in explanation:
+                entry = base_class.Entry()
+                entry.pos = item[0]
+                entry.explanation = ";".join([x.strip() for x in item[1].split(";")])
+                for pron_string, sound in pron:
+                    entry.pronounciation.append((pron_string[0],
+                                                "".join(pron_string[1:].split())))
+                    entry.sound.append(sound)
+                self.entries.append(entry)
         else:
-            span = base_speak.find_all("span")
-            i = base_speak.find_all("i")
-            for index, item in enumerate(span):
-                text = item.get_text()
-                entry.pronounciation.append((text[0],
-                                             "".join(text[1:].split())))
-                href = i[index]["onmouseover"]
-                entry.sound.append(href[href.index("http"): -2])
-
-        # Explanation
-        # Take only the first list
-        base_list = div.find_all(attrs={"class": "base-list switch_part"})
-        if len(base_list) is not 0:
-            items = base_list[0].find_all("li")
-            # Different pos
-            for item in items:
-                copy_entry = base_class.Entry()
-                copy_entry.pronounciation = entry.pronounciation
-                copy_entry.sound = entry.sound
-                copy_entry.pos = item.span.get_text()
-                exp_text = [x.strip() for x in item.p.get_text().split(";")]
-                copy_entry.explanation = ";".join(exp_text)
-                self.entries.append(copy_entry)
-        else:
-            # There is only the keyword with no explanation
             self.valid = False
 
     def lookup(self):
@@ -69,15 +70,7 @@ class Iciba(base_class.SuperEntry):
         # Fetch data from the server
         response = requests.get(self.base_url + self.word_text)
 
-        # Parse the webpage
-        soup = BeautifulSoup(response, "lxml")
-        divs = soup.find_all("div", attrs={"class": "info-article info-base"})
-
-        if (len(divs) == 0):
-            self.valid = False
-        else:
-            # Only parse first div
-            self._store_info(divs[0])
+        self._store_info(response)
 
     def show_no_style(self):
         """Generate displayable formated text"""
