@@ -41,9 +41,7 @@ class Iciba(base_class.SuperEntry):
             for index, item in enumerate(span):
                 text = item.get_text()
                 entry.pronounciation.append((text[0],
-                                             "[" +
-                                             text[text.index("[") + 2: -2] +
-                                             "]"))
+                                             "".join(text[1:].split())))
                 href = i[index]["onmouseover"]
                 entry.sound.append(href[href.index("http"): -2])
 
