@@ -34,7 +34,7 @@ class Iciba(base_class.SuperEntry):
                         .*?
                         <\/ul>"""
         explanation_pat = """(?xs)
-                             (?<= <span\sclass='prop'>) #m atch a prop class span
+                             (?<= <span\sclass='prop'>) # match a prop class span
                              (?P<prop>.*?)   # the prop content
                              (?= <\/span>)   # end of the span
                              .*?             # something in between
@@ -42,14 +42,14 @@ class Iciba(base_class.SuperEntry):
                              (?P<p>.*?)      # the content in p
                              (?= <\/p>)"""
         pron_pat = """(?xs)
-                    (?<= <span>) #m atch a prop class span
+                    (?<= <span>) # match a prop class span
                     (?P<pron>\w?\s\[.*?\])   # the prop content
                     (?= <\/span><i\sclass='new-speak-step'\s
                     onmouseover="displayAudio\(')   # end of the span
                     (?: .*?)       # the p tag
                     (?P<url> http.*?\.mp3)      # the content in p
                     (?: .*?<\/i>)"""
-    
+
         entry_match = re.search(entry_pat, response)
         if entry_match:
             pron = re.findall(pron_pat, response)
