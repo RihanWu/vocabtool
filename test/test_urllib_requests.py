@@ -10,35 +10,52 @@ from vocabtool import urllib_requests
 class TestUrllibRequestsGet(unittest.TestCase):
     """Test case for urllib_requests get method"""
 
-    def test_get_big5_specified(self):
-        test_url = "https://s3.amazonaws.com/python.test/big5.txt"
-        self.assertEqual(urllib_requests.get(test_url, codec="big5"),
+    def setUp(self):
+        self.url_big5 = "https://s3.amazonaws.com/python.test/big5.txt"
+        self.url_sjis = "https://s3.amazonaws.com/python.test/sjis.txt"
+        self.url_utf8 = "https://s3.amazonaws.com/python.test/utf8.txt"
+        self.url_big5_given = "https://s3.amazonaws.com/python.test/big5_given.txt"
+        self.url_sjis_given = "https://s3.amazonaws.com/python.test/sjis_given.txt"
+        self.url_utf8_given = "https://s3.amazonaws.com/python.test/utf8_given.txt"
+        self.url_sjis_wrong_header = "https://s3.amazonaws.com/python.test/sjis_wrong_header.txt"
+
+    def tearDown(self):
+        pass
+
+    def test_get_specified(self):
+        self.assertEqual(urllib_requests.get(self.url_big5, codec="big5"),
                          "這是一段繁中文字\n")
-
-    def test_get_big5_given(self):
-        test_url = "https://s3.amazonaws.com/python.test/big5_given.txt"
-        self.assertEqual(urllib_requests.get(test_url),
-                         "這是一段繁中文字\n")
-
-    def test_get_sjis_specified(self):
-        test_url = "https://s3.amazonaws.com/python.test/sjis.txt"
-        self.assertEqual(urllib_requests.get(test_url, codec="sjis"),
+        self.assertEqual(urllib_requests.get(self.url_sjis, codec="sjis"),
                          "これは日本語です。\n")
+        self.assertEqual(urllib_requests.get(self.url_utf8, codec="utf-8"),
+                         "这是个UTF-8测试\n")
 
-    def test_get_sjis_given(self):
-        test_url = "https://s3.amazonaws.com/python.test/sjis_given.txt"
-        self.assertEqual(urllib_requests.get(test_url),
-                         "これは日本語です。\n")
-
-    def test_get_sjis_wrong_header(self):
-        test_url = "https://s3.amazonaws.com/python.test/sjis_wrong_header.txt"
+    def test_get_unspecified(self):
         self.assertRaises(UnicodeDecodeError,
                           urllib_requests.get,
-                          test_url)
+                          self.url_big5)
+        self.assertRaises(UnicodeDecodeError,
+                          urllib_requests.get,
+                          self.url_sjis)
+        self.assertEqual(urllib_requests.get(self.url_utf8),
+                         "这是个UTF-8测试\n")
+
+    def test_get_given(self):
+        self.assertEqual(urllib_requests.get(self.url_big5_given),
+                         "這是一段繁中文字\n")
+        self.assertEqual(urllib_requests.get(self.url_sjis_given),
+                         "これは日本語です。\n")
+        self.assertEqual(urllib_requests.get(self.url_utf8_given),
+                         "这是个UTF-8测试\n")
+
+    def test_get_wrong_header(self):
+        self.assertRaises(UnicodeDecodeError,
+                          urllib_requests.get,
+                          self.url_sjis_wrong_header)
 
     def test_get_sjis_ignore_wrong_header(self):
-        test_url = "https://s3.amazonaws.com/python.test/sjis_wrong_header.txt"
-        self.assertEqual(urllib_requests.get(test_url, codec="sjis"),
+        self.assertEqual(urllib_requests.get(self.url_sjis_wrong_header,
+                                             codec="sjis"),
                          "これは日本語です。\n")
 
 
