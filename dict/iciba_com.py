@@ -5,16 +5,11 @@ Type: Webpage
 URL: http://www.iciba.com/
 """
 
-import vocabtool.urllibRequests as requests
 import re
-# Third-party library
-from bs4 import BeautifulSoup
 
 # Local module
-if __name__ == "__main__":
-    import base_class
-else:
-    from vocabtool.dict import base_class
+from vocabtool.dict import base_class
+import vocabtool.urllibRequests as requests
 
 __parse_method__ = "re"
 

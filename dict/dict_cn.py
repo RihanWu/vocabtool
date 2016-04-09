@@ -5,15 +5,13 @@ Type: Webpage
 URL: http://dict.cn/
 """
 
-import urllibRequests as requests
-# Third-party library
-from bs4 import BeautifulSoup
+import re
 
 # Local module
-if __name__ == "__main__":
-    import base_class
-else:
-    from dict import base_class
+from vocabtool.dict import base_class
+import vocabtool.urllibRequests as requests
+
+__parse_method__ = "re"
 
 
 class DictCn(base_class.SuperEntry):
@@ -25,35 +23,55 @@ class DictCn(base_class.SuperEntry):
                                        word_text)
         self.base_url = dict_info["base_url"]
 
-    def _store_info(self, div_word):
+    def _store_info(self, response):
         """Parse the incoming div
 
         entry.pronounciation    [(British/American, IPA), ...]
         entry.sound             [(href, href), ...]
         """
 
-        entry = base_class.Entry()
-        entry.separate_storage = True
+        entry_pat = """(?xs)
+                       <div\sclass="word">
+                       .*?
+                       <\/div>
+                       .*?
+                       (?= <div\sclass="section\sdef">)"""
+        explanation_pat = """(?xs)
+                             (?<= <li>)         # match a li
+                             (?: .*?<span>)
+                             (?P<pos>.*?)       # the pos
+                             (?= <\/span>)
+                             .*?                # something in between
+                             (?<= <strong>)     # the strong tag
+                             (?P<exp>.*?)       # the explanation content
+                             (?= <\/strong>)
+                             (?: .*?<\/li>)"""
+        pron_pat = """(?xs)
+                      (?: <span>.*?)
+                      (?P<style>\w)   # the British or American
+                      (?: \s+<bdo.*?>)
+                      (?P<pron>\[.*?\]) # the pronounciation
+                      (?: <\/bdo>.*?naudio=")
+                      (?P<fpron>.*?) # female pronounciation
+                      (?: \?t=.*?naudio=")
+                      (?P<mpron>.*?) # male pronounciation
+                      (?: \?t=.*?<\/span>)"""
 
-        # Pronounciation and sound information
-        phonetic = div_word.find("div", attrs={"class": "phonetic"})
-        spans = phonetic.find_all("span")
-        for span in spans:
-            entry.pronounciation.append(tuple(span.get_text().split()))
-            hrefs = tuple(["http://audio.dict.cn/" + x["naudio"]
-                           for x in span.find_all("i")])
-            entry.sound.append(hrefs)
-
-        # Explanation
-        dict_basic_ul = div_word.find("ul", attrs={"class": "dict-basic-ul"})
-        for child in dict_basic_ul.find_all("li"):
-            if child.get("style") is None:
-                copy_entry = base_class.Entry()
-                copy_entry.pronounciation = entry.pronounciation
-                copy_entry.sound = entry.sound
-                copy_entry.pos = child.span.get_text()
-                copy_entry.explanation = child.strong.get_text()
-                self.entries.append(copy_entry)
+        entry_match = re.search(entry_pat, response)
+        if entry_match:
+            entry_text = entry_match.group(0)
+            pron = re.findall(pron_pat, entry_text)
+            explanation = re.findall(explanation_pat, entry_text)
+            for item in explanation:
+                entry = base_class.Entry()
+                entry.pos = item[0]
+                entry.explanation = item[1]
+                for style, ipa, fpron, mpron in pron:
+                    entry.pronounciation.append((style, ipa))
+                    entry.sound.append((fpron, mpron))
+                self.entries.append(entry)
+        else:
+            self.valid = False
 
     def lookup(self):
         """Lookup word in dict.cn"""
@@ -61,14 +79,7 @@ class DictCn(base_class.SuperEntry):
         # Fetch data from the server
         response = requests.get(self.base_url + self.word_text)
 
-        # Parse the webpage
-        soup = BeautifulSoup(response, "lxml")
-        div_word = soup.find("div", attrs={"class": "word"})
-
-        if (len(div_word.find_all("div")) is 0):
-            self.valid = False
-        else:
-            self._store_info(div_word)
+        self._store_info(response)
 
     def show_no_style(self):
         """Generate displayable formated text"""
