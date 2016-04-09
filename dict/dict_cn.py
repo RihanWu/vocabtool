@@ -5,15 +5,12 @@ Type: Webpage
 URL: http://dict.cn/
 """
 
-import urllibRequests as requests
 # Third-party library
 from bs4 import BeautifulSoup
 
 # Local module
-if __name__ == "__main__":
-    import base_class
-else:
-    from dict import base_class
+from vocabtool.dict import base_class
+import vocabtool.urllibRequests as requests
 
 
 class DictCn(base_class.SuperEntry):
