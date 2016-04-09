@@ -10,10 +10,6 @@ else:
     import urllib.parse as par
 
 
-def _get_encoding(ctstr):
-    return ctstr[ctstr.find('charset')+8:]
-
-
 def _gunzip(data):
     if hexversion < 0x300000:
         import zlib
@@ -31,7 +27,7 @@ def _inflate(data):
         return zlib.decompress(data, -zlib.MAX_WBITS)
 
 
-def get(urlStr, params={}):
+def get(urlStr, params={}, codec=""):
     """Get content on urlStr with params"""
 
     reqdata = req.Request(urlStr)
@@ -50,8 +46,12 @@ def get(urlStr, params={}):
             result = resp.read()
     else:
         result = resp.read()
+    if codec:
+        return result.decode(codec)
     content_type = resp.headers.get('Content-Type')
     if (content_type and content_type.find('charset') != -1):
-        return result.decode(_get_encoding(content_type))
+        encoding = content_type[content_type.find('charset')+8:]
+        return result.decode(encoding)
+    # Default use UTF-8 to decode
     else:
         return result.decode('UTF-8')
