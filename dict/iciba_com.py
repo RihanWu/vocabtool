@@ -5,15 +5,14 @@ Type: Webpage
 URL: http://www.iciba.com/
 """
 
-import urllibRequests as requests
 # Third-party library
 from bs4 import BeautifulSoup
 
 # Local module
-if __name__ == "__main__":
-    import base_class
-else:
-    from dict import base_class
+from vocabtool.dict import base_class
+import vocabtool.urllib_requests as requests
+
+__parse_method__ = "BeautifulSoup"
 
 
 class Iciba(base_class.SuperEntry):
@@ -41,9 +40,7 @@ class Iciba(base_class.SuperEntry):
             for index, item in enumerate(span):
                 text = item.get_text()
                 entry.pronounciation.append((text[0],
-                                             "[" +
-                                             text[text.index("[") + 2: -2] +
-                                             "]"))
+                                             "".join(text[1:].split())))
                 href = i[index]["onmouseover"]
                 entry.sound.append(href[href.index("http"): -2])
 
