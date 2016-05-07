@@ -27,16 +27,19 @@ def _inflate(data):
         return zlib.decompress(data, -zlib.MAX_WBITS)
 
 
-def get(urlStr, params={}, codec=""):
+def get(urlStr, params=None, codec=""):
     """Get content on urlStr with params"""
 
+    # Construct request
     reqdata = req.Request(urlStr)
     reqdata.add_header('User-Agent',
                        'VocabTool/0.2 (https://github.com/RihanWu/vocabtool)')
     reqdata.add_header('Accept-Encoding', 'gzip, deflate')
-    if params != {}:
+    if params:
         reqdata.data = par.urlencode(params).encode('ascii')
     resp = req.urlopen(reqdata)
+
+    # Parse response
     if resp.headers.get('Content-Encoding'):
         if resp.headers.get('Content-Encoding') == 'gzip':
             result = _gunzip(resp.read())
@@ -46,12 +49,15 @@ def get(urlStr, params={}, codec=""):
             result = resp.read()
     else:
         result = resp.read()
+
+    # Decode result
     if codec:
         return result.decode(codec)
-    content_type = resp.headers.get('Content-Type')
-    if (content_type and content_type.find('charset') != -1):
-        encoding = content_type[content_type.find('charset')+8:]
-        return result.decode(encoding)
-    # Default use UTF-8 to decode
     else:
-        return result.decode('UTF-8')
+        content_type = resp.headers.get('Content-Type')
+        if (content_type and content_type.find('charset') != -1):
+            encoding = content_type[content_type.find('charset')+8:]
+            return result.decode(encoding)
+        # Default use UTF-8 to decode
+        else:
+            return result.decode('UTF-8')
