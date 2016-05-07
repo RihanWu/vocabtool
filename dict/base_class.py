@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """This module contains base class for dictionary entry"""
 
 

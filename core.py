@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """VocabTool core module
 
 This is the core module of 'VocabTool'.
