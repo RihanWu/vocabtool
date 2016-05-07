@@ -5,15 +5,14 @@ Type: API
 URL: http://www.dictionaryapi.com/api/v1/references/collegiate/xml/
 """
 
-import urllibRequests as requests
 # Third-party library
 from bs4 import BeautifulSoup
 
 # Local module
-if __name__ == "__main__":
-    import base_class
-else:
-    from dict import base_class
+from vocabtool.dict import base_class
+import vocabtool.urllib_requests as requests
+
+__parse_method__ = "BeautifulSoup"
 
 
 class MerriamWebster(base_class.SuperEntry):

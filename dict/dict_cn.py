@@ -9,7 +9,7 @@ import re
 
 # Local module
 from vocabtool.dict import base_class
-import vocabtool.urllibRequests as requests
+import vocabtool.urllib_requests as requests
 
 __parse_method__ = "re"
 
