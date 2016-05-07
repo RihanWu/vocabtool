@@ -12,6 +12,8 @@ from bs4 import BeautifulSoup
 from vocabtool.dict import base_class
 import vocabtool.urllib_requests as requests
 
+__parse_method__ = "BeautifulSoup"
+
 
 class MerriamWebster(base_class.SuperEntry):
     """Class for looking up a word with Merriam Webster Dictionary API"""
