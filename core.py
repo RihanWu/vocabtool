@@ -30,7 +30,7 @@ for dictionary in config:
 current_word = list()
 
 
-def lookup_word(word_text, search_language):
+def lookup_word(word_text, search_language, source_list=None):
     """Look up word in sources as configed."""
 
     # Reset current word
@@ -39,7 +39,11 @@ def lookup_word(word_text, search_language):
     # Lookup in loaded dictionaries
     for source in loaded_dict:
         if source[1]["lang"] == search_language:
-            current_word.append(source[0].lookup(source[1], word_text))
+            if source_list:
+                if source[1]["id"] in source_list:
+                    current_word.append(source[0].lookup(source[1], word_text))
+            else:
+                current_word.append(source[0].lookup(source[1], word_text))
 
     # Return to GUI
     return current_word

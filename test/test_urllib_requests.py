@@ -11,13 +11,20 @@ class TestUrllibRequestsGet(unittest.TestCase):
     """Test case for urllib_requests get method"""
 
     def setUp(self):
-        self.url_big5 = "https://s3.amazonaws.com/python.test/big5.txt"
-        self.url_sjis = "https://s3.amazonaws.com/python.test/sjis.txt"
-        self.url_utf8 = "https://s3.amazonaws.com/python.test/utf8.txt"
-        self.url_big5_given = "https://s3.amazonaws.com/python.test/big5_given.txt"
-        self.url_sjis_given = "https://s3.amazonaws.com/python.test/sjis_given.txt"
-        self.url_utf8_given = "https://s3.amazonaws.com/python.test/utf8_given.txt"
-        self.url_sjis_wrong_header = "https://s3.amazonaws.com/python.test/sjis_wrong_header.txt"
+        base_url = "https://s3.amazonaws.com/python.test/"
+
+        # Response headers don't contain charset
+        self.url_big5 = base_url + "big5.txt"
+        self.url_sjis = base_url + "sjis.txt"
+        self.url_utf8 = base_url + "utf8.txt"
+
+        # Response headers contain charset
+        self.url_big5_given = base_url + "big5_given.txt"
+        self.url_sjis_given = base_url + "sjis_given.txt"
+        self.url_utf8_given = base_url + "utf8_given.txt"
+
+        # Response header contain wrong charset
+        self.url_sjis_wrong_header = base_url + "sjis_wrong_header.txt"
 
     def tearDown(self):
         pass
