@@ -18,7 +18,10 @@ parser.add_argument("-s", "--source", nargs="+",
 if __name__ == "__main__":
     args = parser.parse_args()
 
-    result = core.lookup_word(args.word, args.language, args.source)
+    # Initialize core
+    vt = core.VocabTool()
+
+    result = vt.look_up_word(args.word, args.language, args.source)
     show = ""
     for super_entry in result:
         show = show + super_entry.show_no_style()
