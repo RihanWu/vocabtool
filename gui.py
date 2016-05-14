@@ -15,7 +15,7 @@ import core
 
 
 # Main frame
-class VocabTool(tk.Tk):
+class VocabToolTkGUI(tk.Tk):
 
     def __init__(self, *args, **kwargs):
 
@@ -126,5 +126,5 @@ class VocabTool(tk.Tk):
         self.word_display.config(state=tk.DISABLED)
 
 
-main = VocabTool()
+main = VocabToolTkGUI()
 main.mainloop()
