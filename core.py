@@ -25,6 +25,7 @@ class VocabTool():
     Attributes:
         config (dict): Configutations
         loaded_dict (list): Loaded dictionary sources
+        current_word (list): Response from different sources for current word
     """
 
     def __init__(self, config_filename="config.json", config_string=None):
@@ -83,7 +84,7 @@ class VocabTool():
 
         # Load enabled dictionary
         self.loaded_dict = list()  # (module, dictionary configuration)
-        for dictionary in self.config:
+        for dictionary in self.config["dictionaries"]:
             if dictionary["enable"]:
                 self.loaded_dict.append((__import__("dict."+dictionary["id"],
                                                     fromlist=["*"]),
@@ -95,8 +96,34 @@ class VocabTool():
     def write_config(self):
         pass
 
-    def look_up_word(self):
-        pass
+    def look_up_word(self, word_text, search_language, source_list=None):
+        """Look up word in sources as configed.
+
+        Args:
+            word_text (str): The word or expression to be looked up
+            search_language (str): Language to look in
+            source_list (Optional[list]): If loaded, use these sources
+
+        Returns:
+            A list of responses from different sources
+        """
+
+        # Reset current word
+        self.current_word = list()
+
+        # Lookup in loaded dictionaries
+        for source in self.loaded_dict:
+            if source[1]["lang"] == search_language:
+                if source_list:
+                    if source[1]["id"] in source_list:
+                        self.current_word.append(source[0].lookup(source[1],
+                                                 word_text))
+                else:
+                    self.current_word.append(source[0].lookup(source[1],
+                                             word_text))
+
+        # Return
+        return self.current_word
 
     def add_to_database(self):
         pass
@@ -106,39 +133,3 @@ class VocabTool():
 
     def generate_LaTeX(self):
         pass
-
-
-#
-## Current word object
-#current_word = list()
-#
-#
-#def lookup_word(word_text, search_language, source_list=None):
-#    """Look up word in sources as configed."""
-#
-#    # Reset current word
-#    current_word = list()
-#
-#    # Lookup in loaded dictionaries
-#    for source in loaded_dict:
-#        if source[1]["lang"] == search_language:
-#            if source_list:
-#                if source[1]["id"] in source_list:
-#                    current_word.append(source[0].lookup(source[1], word_text))
-#            else:
-#                current_word.append(source[0].lookup(source[1], word_text))
-#
-#    # Return to GUI
-#    return current_word
-#
-#
-#def add_to_database():
-#    """Add the current word to database."""
-#
-#    response = database.add(current_word)
-#
-#
-#def generate_pdf():
-#    """Generate pdf that meets the requirement."""
-#
-#    response = generate.generate_pdf()

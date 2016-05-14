@@ -88,6 +88,7 @@ class TestCoreConfigLoadFromFile(unittest.TestCase):
     """Test case for the config components of core"""
 
     def setUp(self):
+        
         self.instance = core.VocabTool()
 
     def tearDown(self):
@@ -115,19 +116,39 @@ class TestCoreLookUp(unittest.TestCase):
     """Test case for core's components related to looking up words"""
 
     def setUp(self):
-        pass
+        config_string = """{
+                                "dictionaries":
+                                [
+                                    {
+                                        "base_url": "http://dict.cn/",
+                                        "dictionary_name": "海词词典",
+                                        "enable": true,
+                                        "id": "dict_cn",
+                                        "lang": "en"
+                                    }
+                                ]
+                            }
+                        """
+        self.instance = core.VocabTool(config_string=config_string)
 
     def tearDown(self):
         pass
 
     def test_lookup_invalid_word(self):
-        pass
+        result = self.instance.look_up_word("ttt", "en")
+        self.assertEqual(result[0].show_no_style(), "海词词典\n\n No result\n\n")
 
     def test_lookup_invalid_language(self):
-        pass
+        result = self.instance.look_up_word("ttt", "aa")
+        self.assertFalse(result)
 
     def test_lookup_empty_source_list(self):
-        pass
+        result = self.instance.look_up_word("ttt", "en", [])
+        self.assertEqual(result[0].show_no_style(), "海词词典\n\n No result\n\n")
+
+    def test_lookup_source_list_not_match(self):
+        result = self.instance.look_up_word("ttt", "en", ["iciba_com"])
+        self.assertFalse(result)
 
 
 class TestCoreAddToDatabase(unittest.TestCase):
