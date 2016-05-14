@@ -23,59 +23,43 @@ class VocabTool():
     """The core component of Vocabtool
 
     Attributes:
+        config_filename (str): Configuration file name
         config (dict): Configutations
         loaded_dict (list): Loaded dictionary sources
         current_word (list): Response from different sources for current word
     """
 
-    def __init__(self, config_filename="config.json", config_string=None):
+    def __init__(self, config_filename="config.json"):
         """Initializer of VocabTool class
 
         Args:
-            config_filename (Optional[str]): Name of configuration file
-            config_string (Optional[str]): A string containning json formated
-                configuration
+            config_filename (Optional[str]): Configuration file name
         """
 
-        self.load_config(config_filename, config_string)
+        self.config_filename = config_filename
+        self.load_config()
 
-    def load_config(self, config_filename=None, config_string=None):
+    def load_config(self):
         """Read config information from external file or string object
 
         Note:
-            Only one of ``config_filename`` and ``config_string`` will be used.
-            If both are present, ``config_string`` has a higher priority.
-
             If runs successfully, class attribute ``config`` and
             ``loaded_dict``  will be created
-
-        Args:
-            config_filename (Optional[str]): Name of configuration file
-            config_string (Optional[str]): A string containning json formated
-                configuration
 
         Raises:
             ConfigError
         """
 
-        if config_string:
-            try:
-                self.config = json.loads(config_string)
-            except json.decoder.JSONDecodeError:
-                raise ConfigError("Configuration is not valid json format")
-        elif config_filename:
-            try:
-                with open(config_filename, "rb") as handle:
-                    content = handle.read().decode("utf-8")
-                    self.config = json.loads(content)
-            except FileNotFoundError:
-                raise ConfigError("Invalid config file name")
-            except UnicodeDecodeError:
-                raise ConfigError("Config file is not encoded with utf-8")
-            except json.decoder.JSONDecodeError:
-                raise ConfigError("Configuration is not valid json format")
-        else:
-            raise ConfigError("No configuration provided")
+        try:
+            with open(self.config_filename, "rb") as handle:
+                content = handle.read().decode("utf-8")
+                self.config = json.loads(content)
+        except FileNotFoundError:
+            raise ConfigError("Configuration file not found")
+        except UnicodeDecodeError:
+            raise ConfigError("Config file is not encoded with utf-8")
+        except json.decoder.JSONDecodeError:
+            raise ConfigError("Configuration is not valid json format")
 
         # Quick check of validity
         if ("dictionaries" not in self.config.keys() or
