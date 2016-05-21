@@ -24,7 +24,7 @@ class VocabTool():
 
     Attributes:
         config_filename (str): Configuration file name
-        config (dict): Configutations
+        config (dict): Configurations
         loaded_dict (list): Loaded dictionary sources
         current_word (list): Response from different sources for current word
     """
@@ -37,6 +37,9 @@ class VocabTool():
         """
 
         self.config_filename = config_filename
+        self.config = None
+        self.loaded_dict = list()  # (module, dictionary configuration)
+        self.current_word = list()
         self.load_config()
 
     def load_config(self):
@@ -67,18 +70,42 @@ class VocabTool():
             raise ConfigError("Configuration contains no dictionary source")
 
         # Load enabled dictionary
-        self.loaded_dict = list()  # (module, dictionary configuration)
-        for dictionary in self.config["dictionaries"]:
-            if dictionary["enable"]:
-                self.loaded_dict.append((__import__("dict."+dictionary["id"],
+        for dict_id, config in self.config["dictionaries"].items():
+            if config["enable"]:
+                self.loaded_dict.append((__import__("dict." + dict_id,
                                                     fromlist=["*"]),
-                                        dictionary))
+                                        config))
 
-    def read_config(self):
-        pass
+    def read_config(self, config_path):
+        """Read configuration from the loaded configuration object
 
-    def write_config(self):
-        pass
+        Args:
+            config_path (str): Path connected by period
+
+        Returns:
+            A string representing the desired configuration
+        """
+        path = config_path.split(".")
+        temp_config = self.config
+        for i in path:
+            if temp_config.get(i):
+                temp_config = temp_config[i]
+            else:
+                raise ConfigError("Configuration does not exist")
+        return temp_config
+
+    def write_config(self, config_path, config_value):
+        """Write value to specific configuration
+
+        Args:
+            config_path (str): Path connected by period
+            config_value (str): Value to be writen
+        """
+        path = config_path.split(".")
+        temp_config = self.config
+        for i in path[:-1]:
+            temp_config = temp_config[i]
+        temp_config[path[-1]] = config_value
 
     def look_up_word(self, word_text, search_language, source_list=None):
         """Look up word in sources as configed.
@@ -115,5 +142,5 @@ class VocabTool():
     def read_from_database(self):
         pass
 
-    def generate_LaTeX(self):
+    def generate_latex(self):
         pass

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Testing CLI module
+"""Testing core module
 
 Only supports Python 3.x now"""
 
@@ -17,16 +17,15 @@ class TestCoreInitLoadConfig(unittest.TestCase):
 
     def setUp(self):
         valid_config_string = """{
-                                    "dictionaries":
-                                    [
-                                        {
+                                    "dictionaries": {
+                                        "dict_cn": {
                                             "base_url": "http://dict.cn/",
                                             "dictionary_name": "海词词典",
                                             "enable": true,
                                             "id": "dict_cn",
                                             "lang": "en"
                                         }
-                                    ]
+                                    }
                                  }
                               """
         with open("valid_config", "wb") as f:
@@ -48,33 +47,60 @@ class TestCoreInitLoadConfig(unittest.TestCase):
     def test_init_with_non_existing_config_file(self):
         self.assertRaisesRegex(core.ConfigError,
                                "Configuration file not found",
-                               core.VocabTool, config_filename="no file")
+                               core.VocabTool,
+                               config_filename="no file")
 
     def test_init_with_config_file_of_non_utf8_encoding(self):
         self.assertRaisesRegex(core.ConfigError,
                                "Config file is not encoded with utf-8",
-                               core.VocabTool, config_filename="non_utf8")
+                               core.VocabTool,
+                               config_filename="non_utf8")
 
     def test_init_with_config_file_of_invalid_json_format(self):
         self.assertRaisesRegex(core.ConfigError,
                                "Configuration is not valid json format",
-                               core.VocabTool, config_filename="invalid_json")
+                               core.VocabTool,
+                               config_filename="invalid_json")
 
 
 class TestCoreConfig(unittest.TestCase):
     """Test case for the config components of core"""
 
     def setUp(self):
-        self.instance = core.VocabTool()
+        valid_config_string = """{
+                                    "dictionaries": {
+                                        "dict_cn": {
+                                            "base_url": "http://dict.cn/",
+                                            "dictionary_name": "海词词典",
+                                            "enable": true,
+                                            "id": "dict_cn",
+                                            "lang": "en"
+                                        }
+                                    }
+                                 }
+                              """
+
+        with open("valid_config", "wb") as f:
+            f.write(valid_config_string.encode("utf8"))
+        self.vt = core.VocabTool(config_filename="valid_config")
 
     def tearDown(self):
-        pass
+        os.remove("valid_config")
 
-    def test_read_config(self):
-        pass
+    def test_read_config_valid(self):
+        self.assertEqual(self.vt.read_config("dictionaries.dict_cn.lang"),
+                         "en")
 
-    def test_write_config(self):
-        pass
+    def test_read_config_invalid(self):
+        self.assertRaisesRegex(core.ConfigError,
+                               "Configuration does not exist",
+                               self.vt.read_config,
+                               "dictionaries.dict_cn.some_config")
+
+    def test_write_config_valid(self):
+        self.vt.write_config("dictionaries.dict_cn.lang", "de")
+        self.assertEqual(self.vt.config["dictionaries"]["dict_cn"]["lang"],
+                         "de")
 
 
 class TestCoreLookUp(unittest.TestCase):
@@ -82,16 +108,15 @@ class TestCoreLookUp(unittest.TestCase):
 
     def setUp(self):
         valid_config_string = """{
-                                    "dictionaries":
-                                    [
-                                        {
+                                    "dictionaries": {
+                                        "dict_cn": {
                                             "base_url": "http://dict.cn/",
                                             "dictionary_name": "海词词典",
                                             "enable": true,
                                             "id": "dict_cn",
                                             "lang": "en"
                                         }
-                                    ]
+                                    }
                                  }
                               """
         with open("valid_config", "wb") as f:
