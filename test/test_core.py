@@ -18,11 +18,11 @@ class TestCoreInitLoadConfig(unittest.TestCase):
     def setUp(self):
         valid_config_string = """{
                                     "dictionaries": {
-                                        "dict_cn": {
-                                            "base_url": "http://dict.cn/",
-                                            "dictionary_name": "海词词典",
+                                        "test_dict": {
+                                            "base_url": "Test base_url",
+                                            "dictionary_name": "Test Dict",
                                             "enable": true,
-                                            "id": "dict_cn",
+                                            "id": "test_dict",
                                             "lang": "en"
                                         }
                                     }
@@ -34,11 +34,41 @@ class TestCoreInitLoadConfig(unittest.TestCase):
             f.write("测试".encode("gb2312"))
         with open("invalid_json", "wb") as f:
             f.write("test".encode("utf8"))
+        temp_dict = """
+# -*- coding: utf-8 -*-
+from vocabtool.dict import base_class
+
+class TestDict(base_class.SuperEntry):
+
+    def __init__(self, dict_info, word_text):
+        base_class.SuperEntry.__init__(self, dict_info["id"],
+                                       dict_info["dictionary_name"],
+                                       word_text)
+        self.base_url = dict_info["base_url"]
+
+    def lookup(self):
+        pass
+
+    def show_no_style(self):
+        return "pass"
+
+    show_with_style = show_no_style
+
+
+def lookup(dict_info, word_text):
+    result = TestDict(dict_info, word_text)
+    result.lookup()
+    return result
+
+"""
+        with open("dict/test_dict.py", "w") as f:
+            f.write(temp_dict)
 
     def tearDown(self):
         os.remove("valid_config")
         os.remove("non_utf8")
         os.remove("invalid_json")
+        os.remove("dict/test_dict.py")
 
     def test_init_with_existing_config_file(self):
         instance = core.VocabTool(config_filename="valid_config")
@@ -69,11 +99,11 @@ class TestCoreConfig(unittest.TestCase):
     def setUp(self):
         valid_config_string = """{
                                     "dictionaries": {
-                                        "dict_cn": {
-                                            "base_url": "http://dict.cn/",
-                                            "dictionary_name": "海词词典",
+                                        "test_dict": {
+                                            "base_url": "Test base_url",
+                                            "dictionary_name": "Test Dict",
                                             "enable": true,
-                                            "id": "dict_cn",
+                                            "id": "test_dict",
                                             "lang": "en"
                                         }
                                     }
@@ -82,24 +112,54 @@ class TestCoreConfig(unittest.TestCase):
 
         with open("valid_config", "wb") as f:
             f.write(valid_config_string.encode("utf8"))
+        temp_dict = """
+# -*- coding: utf-8 -*-
+from vocabtool.dict import base_class
+
+class TestDict(base_class.SuperEntry):
+
+    def __init__(self, dict_info, word_text):
+        base_class.SuperEntry.__init__(self, dict_info["id"],
+                                       dict_info["dictionary_name"],
+                                       word_text)
+        self.base_url = dict_info["base_url"]
+
+    def lookup(self):
+        pass
+
+    def show_no_style(self):
+        return "pass"
+
+    show_with_style = show_no_style
+
+
+def lookup(dict_info, word_text):
+    result = TestDict(dict_info, word_text)
+    result.lookup()
+    return result
+
+"""
+        with open("dict/test_dict.py", "w") as f:
+            f.write(temp_dict)
         self.vt = core.VocabTool(config_filename="valid_config")
 
     def tearDown(self):
         os.remove("valid_config")
+        os.remove("dict/test_dict.py")
 
     def test_read_config_valid(self):
-        self.assertEqual(self.vt.read_config("dictionaries.dict_cn.lang"),
+        self.assertEqual(self.vt.read_config("dictionaries.test_dict.lang"),
                          "en")
 
     def test_read_config_invalid(self):
         self.assertRaisesRegex(core.ConfigError,
                                "Configuration does not exist",
                                self.vt.read_config,
-                               "dictionaries.dict_cn.some_config")
+                               "dictionaries.test_dict.some_config")
 
     def test_write_config_valid(self):
-        self.vt.write_config("dictionaries.dict_cn.lang", "de")
-        self.assertEqual(self.vt.config["dictionaries"]["dict_cn"]["lang"],
+        self.vt.write_config("dictionaries.test_dict.lang", "de")
+        self.assertEqual(self.vt.config["dictionaries"]["test_dict"]["lang"],
                          "de")
 
 
@@ -109,11 +169,11 @@ class TestCoreLookUp(unittest.TestCase):
     def setUp(self):
         valid_config_string = """{
                                     "dictionaries": {
-                                        "dict_cn": {
-                                            "base_url": "http://dict.cn/",
-                                            "dictionary_name": "海词词典",
+                                        "test_dict": {
+                                            "base_url": "foo bar",
+                                            "dictionary_name": "Test Dict",
                                             "enable": true,
-                                            "id": "dict_cn",
+                                            "id": "test_dict",
                                             "lang": "en"
                                         }
                                     }
@@ -121,14 +181,44 @@ class TestCoreLookUp(unittest.TestCase):
                               """
         with open("valid_config", "wb") as f:
             f.write(valid_config_string.encode("utf8"))
+        temp_dict = """
+# -*- coding: utf-8 -*-
+from vocabtool.dict import base_class
+
+class TestDict(base_class.SuperEntry):
+
+    def __init__(self, dict_info, word_text):
+        base_class.SuperEntry.__init__(self, dict_info["id"],
+                                       dict_info["dictionary_name"],
+                                       word_text)
+        self.base_url = dict_info["base_url"]
+
+    def lookup(self):
+        pass
+
+    def show_no_style(self):
+        return "pass"
+
+    show_with_style = show_no_style
+
+
+def lookup(dict_info, word_text):
+    result = TestDict(dict_info, word_text)
+    result.lookup()
+    return result
+
+"""
+        with open("dict/test_dict.py", "w") as f:
+            f.write(temp_dict)
         self.instance = core.VocabTool(config_filename="valid_config")
 
     def tearDown(self):
         os.remove("valid_config")
+        os.remove("dict/test_dict.py")
 
     def test_lookup_invalid_word(self):
         result = self.instance.look_up_word("ttt", "en")
-        self.assertEqual(result[0].show_no_style(), "海词词典\n\n No result\n\n")
+        self.assertEqual(result[0].show_no_style(), "pass")
 
     def test_lookup_invalid_language(self):
         result = self.instance.look_up_word("ttt", "aa")
@@ -136,10 +226,10 @@ class TestCoreLookUp(unittest.TestCase):
 
     def test_lookup_empty_source_list(self):
         result = self.instance.look_up_word("ttt", "en", [])
-        self.assertEqual(result[0].show_no_style(), "海词词典\n\n No result\n\n")
+        self.assertEqual(result[0].show_no_style(), "pass")
 
     def test_lookup_source_list_not_match(self):
-        result = self.instance.look_up_word("ttt", "en", ["iciba_com"])
+        result = self.instance.look_up_word("ttt", "en", ["foo"])
         self.assertFalse(result)
 
 
