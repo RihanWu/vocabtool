@@ -77,9 +77,13 @@ class DictCn(base_class.SuperEntry):
         """Lookup word in dict.cn"""
 
         # Fetch data from the server
-        response = requests.get(self.base_url + self.word_text)
-
-        self._store_info(response)
+        try:
+            response = requests.get(self.base_url + self.word_text)
+            self._store_info(response)
+            self.error_code = None
+        except HTTPError as error:
+            self.valid = False
+            self.error_code = str(error.code)
 
     def show_no_style(self):
         """Generate displayable formated text"""
@@ -97,6 +101,8 @@ class DictCn(base_class.SuperEntry):
                                                     entry.pos)])
                 formated_text = "   ".join([formated_text,
                                            entry.explanation])
+        elif self.error_code:
+            formated_text = self.source_name + "\n\n Error:" + self.error_code
         else:
             formated_text = self.source_name + "\n\n No result"
         return formated_text + "\n\n"

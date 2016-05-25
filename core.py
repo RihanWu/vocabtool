@@ -12,50 +12,135 @@ import database
 import generate
 
 
-# Read config from external config file
-config_filename = "config.json"
-with open(config_filename, "rb") as handle:
-    content = handle.read().decode("utf-8")
-    config = json.loads(content)
+class ConfigError(Exception):
+    """Exception raised for errors regarding configuration"""
 
-# Load enabled dictionary
-loaded_dict = list()  # (module, dictionary configuration)
-for dictionary in config:
-    if dictionary["enable"]:
-        loaded_dict.append((__import__("dict."+dictionary["id"],
-                                       fromlist=["*"]),
-                           dictionary))
-
-# Current word object
-current_word = list()
+    def __init__(self, message):
+        self.message = message
 
 
-def lookup_word(word_text, search_language, source_list=None):
-    """Look up word in sources as configed."""
+class VocabTool():
+    """The core component of Vocabtool
 
-    # Reset current word
-    current_word = list()
+    Attributes:
+        config_filename (str): Configuration file name
+        config (dict): Configurations
+        loaded_dict (list): Loaded dictionary sources
+        current_word (list): Response from different sources for current word
+    """
 
-    # Lookup in loaded dictionaries
-    for source in loaded_dict:
-        if source[1]["lang"] == search_language:
-            if source_list:
-                if source[1]["id"] in source_list:
-                    current_word.append(source[0].lookup(source[1], word_text))
+    def __init__(self, config_filename="config.json"):
+        """Initializer of VocabTool class
+
+        Args:
+            config_filename (Optional[str]): Configuration file name
+        """
+
+        self.config_filename = config_filename
+        self.config = None
+        self.loaded_dict = list()  # (module, dictionary configuration)
+        self.current_word = list()
+        self.load_config()
+
+    def load_config(self):
+        """Read config information from external file or string object
+
+        Note:
+            If runs successfully, class attribute ``config`` and
+            ``loaded_dict``  will be created
+
+        Raises:
+            ConfigError
+        """
+
+        try:
+            with open(self.config_filename, "rb") as handle:
+                content = handle.read().decode("utf-8")
+                self.config = json.loads(content)
+        except FileNotFoundError:
+            raise ConfigError("Configuration file not found")
+        except UnicodeDecodeError:
+            raise ConfigError("Config file is not encoded with utf-8")
+        except json.decoder.JSONDecodeError:
+            raise ConfigError("Configuration is not valid json format")
+
+        # Quick check of validity
+        if ("dictionaries" not in self.config.keys() or
+                len(self.config["dictionaries"]) == 0):
+            raise ConfigError("Configuration contains no dictionary source")
+
+        # Load enabled dictionary
+        for dict_id, config in self.config["dictionaries"].items():
+            if config["enable"]:
+                self.loaded_dict.append((__import__("dict." + dict_id,
+                                                    fromlist=["*"]),
+                                        config))
+
+    def read_config(self, config_path):
+        """Read configuration from the loaded configuration object
+
+        Args:
+            config_path (str): Path connected by period
+
+        Returns:
+            A string representing the desired configuration
+        """
+        path = config_path.split(".")
+        temp_config = self.config
+        for i in path:
+            if temp_config.get(i):
+                temp_config = temp_config[i]
             else:
-                current_word.append(source[0].lookup(source[1], word_text))
+                raise ConfigError("Configuration does not exist")
+        return temp_config
 
-    # Return to GUI
-    return current_word
+    def write_config(self, config_path, config_value):
+        """Write value to specific configuration
 
+        Args:
+            config_path (str): Path connected by period
+            config_value (str): Value to be writen
+        """
+        path = config_path.split(".")
+        temp_config = self.config
+        for i in path[:-1]:
+            temp_config = temp_config[i]
+        temp_config[path[-1]] = config_value
 
-def add_to_database():
-    """Add the current word to database."""
+    def look_up_word(self, word_text, search_language, source_list=None):
+        """Look up word in sources as configed.
 
-    response = database.add(current_word)
+        Args:
+            word_text (str): The word or expression to be looked up
+            search_language (str): Language to look in
+            source_list (Optional[list]): If loaded, use these sources
 
+        Returns:
+            A list of responses from different sources
+        """
 
-def generate_pdf():
-    """Generate pdf that meets the requirement."""
+        # Reset current word
+        self.current_word = list()
 
-    response = generate.generate_pdf()
+        # Lookup in loaded dictionaries
+        for source in self.loaded_dict:
+            if source[1]["lang"] == search_language:
+                if source_list:
+                    if source[1]["id"] in source_list:
+                        self.current_word.append(source[0].lookup(source[1],
+                                                 word_text))
+                else:
+                    self.current_word.append(source[0].lookup(source[1],
+                                             word_text))
+
+        # Return
+        return self.current_word
+
+    def add_to_database(self):
+        pass
+
+    def read_from_database(self):
+        pass
+
+    def generate_latex(self):
+        pass
