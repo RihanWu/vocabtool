@@ -2,7 +2,7 @@
     "dictionaries": {
         "m_w_c_d": {
             "base_url": "http://www.dictionaryapi.com/api/v1/references/collegiate/xml/",
-            "dictionary_name": "Merriam-Webster's Collegiate\u00ae Dictionary with Audio",
+            "dictionary_name": "Merriam-Webster's Collegiate Dictionary with Audio",
             "key": "here goes the key",
             "enable": false,
             "id": "m_w_c_d",

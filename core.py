@@ -11,6 +11,8 @@ import json
 import database
 import generate
 
+__version__ = "Waiting for assignment"
+
 
 class ConfigError(Exception):
     """Exception raised for errors regarding configuration"""
