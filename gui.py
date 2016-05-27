@@ -15,7 +15,7 @@ import core
 
 
 # Main frame
-class VocabTool(tk.Tk):
+class VocabToolTkGUI(tk.Tk):
 
     def __init__(self, *args, **kwargs):
 
@@ -86,13 +86,16 @@ class VocabTool(tk.Tk):
         menu_f_ex.add_command(label="Explanation Only",
                               command=lambda: self.ex("e"))
 
+        # Initialize core
+        self.vt = core.VocabTool()
+
     def lookup(self):
         """Look up the word in the input box"""
 
         # TODO: Implement tagged display <RihanW>
         # Pass the request to core
-        lookup_result = core.lookup_word(self.word_text.get(),
-                                         self.language.get())
+        lookup_result = self.vt.look_up_word(self.word_text.get(),
+                                             self.language.get())
 
         # Show result
         show = ""
@@ -126,5 +129,5 @@ class VocabTool(tk.Tk):
         self.word_display.config(state=tk.DISABLED)
 
 
-main = VocabTool()
+main = VocabToolTkGUI()
 main.mainloop()
